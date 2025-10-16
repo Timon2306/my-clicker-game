@@ -42,6 +42,7 @@
             <button class="upgrade-button" onclick="showScreen('upgrades')">🛒 Магазин</button>
             <button class="upgrade-button" onclick="showScreen('profile')">👤 Профиль</button>
             <button class="upgrade-button" onclick="showScreen('leaderboard')">🏆 Топ</button>
+            <button class="upgrade-button" id="load-progress-btn">🔄 Загрузить прогресс</button>
         </div>
     </div>
     <div id="upgrades-screen" class="menu-screen"><button class="back-button" onclick="showScreen('main')">← Назад</button><h2>🛒 Магазин улучшений</h2><div id="upgrades-list"></div></div>
@@ -189,13 +190,31 @@
             if (autoIncome>0) gameData.balance += autoIncome;
             updateUI(); saveGame();
         },1000);
+        // --- Загрузка и сохранение с сервера
         if (tg) {
             tg.MainButton.setText('💾 Сохранить прогресс');
             tg.MainButton.show();
             tg.MainButton.onClick(()=>{ tg.sendData(JSON.stringify({type:'save_progress',userId,data:gameData})); });
+            tg.onEvent && tg.onEvent('web_app_data', function(event) {
+                try {
+                    const obj = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                    if (obj.type === 'load_progress' && obj.data) {
+                        gameData = {...gameData, ...obj.data};
+                        saveGame();
+                        updateUI();
+                        alert('✅ Прогресс загружен с сервера!');
+                    }
+                } catch (e) {}
+            });
             tg.ready();
         }
         document.getElementById('crystal-btn').addEventListener('click', tap);
+        // --- Кнопка загрузки
+        document.getElementById('load-progress-btn').addEventListener('click', function() {
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify({ type: 'request_progress' }));
+            }
+        });
         updateUI();
     </script>
 </body>
