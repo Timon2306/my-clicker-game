@@ -95,27 +95,25 @@
         }
 
         function tap() {
-            if (gameData.energy <= 0) return;
-            const power = getTapPower();
-            gameData.balance += power;
-            gameData.energy = Math.max(0, gameData.energy - 1);
-            gameData.experience += 1;
-            gameData.totalTaps++;
-            // Достижение "Первый тап" — только первый раз!
-            if (!gameData.achievements.includes('first_tap') && gameData.totalTaps === 1) {
-                unlockAchievement('first_tap');
-            }
-            // Повышение уровня
-            if (gameData.experience >= getExpNeeded()) {
-                gameData.level++;
-                gameData.experience -= getExpNeeded();
-                showFloatingText('+УРОВЕНЬ!', '#ffd700');
-                checkComboAchievements();
-            }
-            showFloatingText('+' + power, '#00ff88');
-            updateUI();
-            saveGame();
-        }
+    if (gameData.energy <= 0) return;
+    const power = getTapPower();
+    gameData.balance += power;
+    gameData.energy = Math.max(0, gameData.energy - 1);
+    gameData.experience += 1;
+    gameData.totalTaps++;
+
+    if (gameData.experience >= getExpNeeded()) {
+        gameData.level++;
+        gameData.experience -= getExpNeeded();
+        showFloatingText('+УРОВЕНЬ!', '#ffd700');
+        // никаких ачивок!
+    }
+    showFloatingText('+' + power, '#00ff88');
+    updateUI();
+    saveGame();
+}
+// И всё — никакой tg.sendData, никакой checkAchievements, никакой unlockAchievement
+
 
         function showFloatingText(text, color) {
             const floatingText = document.createElement('div');
@@ -257,3 +255,4 @@
     </script>
 </body>
 </html>
+
